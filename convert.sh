@@ -7,15 +7,19 @@
 #- make ffmpeg params contants at the top of the script so I can tweak them around
 
 # FFmpeg parameters - tweak these to customize conversion
-INPUT_DIR="."           # Input directory (current folder)
-OUTPUT_DIR="output"     # Output folder name
-PORTRAIT_ASPECT=9       # Portrait aspect ratio (9:16)
-LANDSCAPE_ASPECT=16     # Landscape aspect ratio (16:9)
-TARGET_WIDTH=1080       # Target width in pixels
-TARGET_HEIGHT=1920      # Target height in pixels
-VIDEO_CODEC="libx264"   # Video codec
-AUDIO_CODEC="aac"       # Audio codec
-PRESET="fast"           # Encoding preset
+INPUT_DIR="."         # Input directory (current folder)
+OUTPUT_DIR="output"   # Output folder name
+PORTRAIT_ASPECT=9     # Portrait aspect ratio (9:16)
+LANDSCAPE_ASPECT=16   # Landscape aspect ratio (16:9)
+TARGET_WIDTH=1080     # Target width in pixels
+TARGET_HEIGHT=1920    # Target height in pixels
+VIDEO_CODEC="libx264" # Video codec
+AUDIO_CODEC="aac"     # Audio codec
+PRESET="fast"         # Encoding preset
+VIEWPORT_OFFSET=-13   # Shift crop window, as % of trimmed margin width.
+# 0 = centered on road center. Viewport mounted off-center?
+# Compensate so road center stays centered: negative shifts
+# window LEFT, positive shifts RIGHT. Range -100..100.
 # ---------------------------------------------------------
 
 # Create output directory, removing any existing one to ensure clean overwrite
@@ -54,7 +58,7 @@ for f in "$INPUT_DIR"/*; do
     # -c:a "$AUDIO_CODEC" - audio encoder
     # -y "$output_file" - overwrite output if it exists
     ffmpeg -i "$f" -map_metadata 0 \
-        -vf "crop=ih*${PORTRAIT_ASPECT}/${LANDSCAPE_ASPECT}:ih:(in_w-out_w)/2:0,scale=${TARGET_WIDTH}:${TARGET_HEIGHT}" \
+        -vf "crop=ih*${PORTRAIT_ASPECT}/${LANDSCAPE_ASPECT}:ih:(in_w-out_w)/2+(in_w-out_w)*${VIEWPORT_OFFSET}/100:0,scale=${TARGET_WIDTH}:${TARGET_HEIGHT}" \
         -c:v "$VIDEO_CODEC" -preset "$PRESET" \
         -c:a "$AUDIO_CODEC" \
         -y "$output_file"
