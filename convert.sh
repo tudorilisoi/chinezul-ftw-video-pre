@@ -46,7 +46,8 @@ for f in "$INPUT_DIR"/*; do
     # ffmpeg command:
     # -i "$f"           - input file
     # -map_metadata 0     - copy metadata from source (handles orientation)
-    # -vf "crop=...      - crop to portrait aspect, removing left/right margins,
+    # -vf "crop=...      - crop to centered portrait strip (9:16), keeping
+    #                     the horizontal middle, cutting left/right margins,
     #                     then scale to target resolution
     # -c:v "$VIDEO_CODEC" - video encoder
     # -preset "$PRESET" - encoding speed/quality tradeoff
