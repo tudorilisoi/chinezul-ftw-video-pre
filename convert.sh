@@ -22,6 +22,9 @@ PRESET="fast"           # Encoding preset
 rm -rf "$OUTPUT_DIR"
 mkdir -p "$OUTPUT_DIR"
 
+# Timestamp for output filenames: dd-mm-yy-hh:mm:ss
+TIMESTAMP=$(date +%d-%m-%y-%H:%M:%S)
+
 # Process each video file in the input directory
 for f in "$INPUT_DIR"/*; do
     # Skip if not a regular file (skip directories, the script itself, etc.)
@@ -36,7 +39,7 @@ for f in "$INPUT_DIR"/*; do
     basename_noext="${filename%.*}"
 
     # Output file path
-    output_file="$OUTPUT_DIR/${basename_noext}_portrait.mp4"
+    output_file="$OUTPUT_DIR/${basename_noext}_portrait_${TIMESTAMP}.mp4"
 
     echo "Converting: $f -> $output_file"
 
@@ -50,7 +53,7 @@ for f in "$INPUT_DIR"/*; do
     # -c:a "$AUDIO_CODEC" - audio encoder
     # -y "$output_file" - overwrite output if it exists
     ffmpeg -i "$f" -map_metadata 0 \
-        -vf "crop=ih*${PORTRAIT_ASPECT}/${LANDSCAPE_ASPECT}:ih:0:0,scale=${TARGET_WIDTH}:${TARGET_HEIGHT}" \
+        -vf "crop=ih*${PORTRAIT_ASPECT}/${LANDSCAPE_ASPECT}:ih:(in_w-out_w)/2:0,scale=${TARGET_WIDTH}:${TARGET_HEIGHT}" \
         -c:v "$VIDEO_CODEC" -preset "$PRESET" \
         -c:a "$AUDIO_CODEC" \
         -y "$output_file"
